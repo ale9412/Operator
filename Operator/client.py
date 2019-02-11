@@ -59,12 +59,12 @@ class TCPInterfaceClient:
 
 class ClientOperator:
 
-    def __init__(self,file_path='operations.log'):
+    def __init__(self):
         # Expression to parse matematical operations
         self.regex = r'(\d+\s[+*-/]\s)+\d+'
-        self.file_path = file_path
+
         # Clean the log file in case that exist already
-        log_file = open(self.file_path,'w')
+        log_file = open('operations.log','w')
         log_file.close()
 
     
@@ -122,7 +122,7 @@ class ClientOperator:
 
     def log(self,operations,results):
         # Open the file in append mode
-        log_file = open(self.file_path,'a')
+        log_file = open('operations.log','a')
         
         # opeations and results list are ordered list objects where every item
         # inside them correspond with the item in the same position
