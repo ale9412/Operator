@@ -9,19 +9,12 @@ This project is a simple client-server implementation for analyzing large files 
 
 It is necesary to install a version of python < 3.7 . All the modules used are from the standard library who comes on board with the python installation.
 
-### Installing
-
-Clone the repository and run the scripts or install it with the command:
-
-pip install package-name
-
-And then import server.py and client.py
-
 ### How to use
 
 To use it, run the script **server.py** which will start listen connections on specified port (default 8000)
 
-Once the server is running, run the **client.py** which will extract the operations out of the **operations.txt** file and send them through a TCP socket connection to the server, which will solve the operations and send back the results to be log by the client in the **operations.log** file.
+
+Once the server is running, run the **client.py** which will extract the operations out of the **operations.txt** file (which needs to be in same directory, or you can specify another file with the same format inside the script) and send them through a TCP socket connection to the server, which will solve the operations and send back the results to be log by the client in the **operations.log** file.
 
 The server to speed up the calculations will use multiple processes, the default is 2 processes but this parameter can be change inside the **server.py** script
 
