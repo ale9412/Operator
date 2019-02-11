@@ -36,8 +36,6 @@ def apply_operator(operators, values):
 
 
 
-
-
 def evaluate(expression):
     tokens = re.findall(r"[+*/()-]|\d+", expression)
     values = []
