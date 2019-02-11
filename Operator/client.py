@@ -8,13 +8,13 @@ class TCPInterfaceClient:
 
     To receive data over a TCP connection four approaches could be made:
 
-        1 - Use as aprotocol that only one message will be sent per connection,
+        1 - Use as a protocol that only one message will be sent per connection,
         and once a message has been sent, the sender will inmidiately close the socket
 
         2 - Use fixed lenght messages. The receiver will read the number of bytes and
         know that it has the whole msg.
 
-        3 - Prefix the msg length at the beginning fo the stream. The receiver will read
+        3 - Prefix the msg length at the beginning of the stream. The receiver will read
         the length from the stream, then it will read the indicated amount of bytes.
 
         4 - Use flags delimiters to indicate end of the stream. The receiver will scan 
@@ -30,6 +30,7 @@ class TCPInterfaceClient:
         self.PORT = port
         # Initializate socket object
         self.sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.buffer = 1048476 # 1MB buffer
 
     def connect(self):
         self.sock.connect((self.HOST,self.PORT))
@@ -38,9 +39,6 @@ class TCPInterfaceClient:
         self.sock.close()
  
     def send(self,stream):
-        # In case of the server the null delimiter never gets send beacause the
-        # the client does not shut the conection until data is received, hence
-        # we must send this flag manually.
         stream = stream + b'\0'
         self.sock.sendall(stream)
 
@@ -49,7 +47,7 @@ class TCPInterfaceClient:
         msg = ""
        # Receive data from the server and shut down
         while not msg:
-            received = self.sock.recv(8192)
+            received = self.sock.recv(self.buffer)
             data = data + received
             if received == b'':
                 # Get a string out of the bytes stream
@@ -64,6 +62,11 @@ class ClientOperator:
     def __init__(self):
         # Expression to parse matematical operations
         self.regex = r'(\d+\s[+*-/]\s)+\d+'
+
+        # Clean the log file in case that exist already
+        log_file = open('operations.log','w')
+        log_file.close()
+
     
     def is_valid(self,op):
         pattern = re.compile(self.regex)
@@ -74,45 +77,70 @@ class ClientOperator:
     
     def start(self):
         operation_file = open("operations.txt")
+        operations = []
+        results = []
         while True:
-            # Read in batches and send. Read the entire file could be memory expensive
-            # and read it line by line to slow.
-            lines = operation_file.readlines(10000)
+            """ Read in batches and send. Read the entire file could be memory expensive
+                and read it line by line to slow.
+                The number passed to the readlines method is the number of caracters to be read, the file will be 
+                read multiple times until end of the file is reached."""
+            lines = operation_file.readlines(2000000)
+            
             if not lines:
             # If the end of the file was reached break the loop
                 break
 
+            # Clean the operations list, to contain only valid operations.
             for operation in lines:
-                # Clean the operations list, to contain only valid operations.
                 if not self.is_valid(operation):
-                    # Remove operation from the list
+                    # If it is not a valid arithmetic operation remove it.
                     lines.remove(operation)
 
-            # Make data stream to send over the socket connection 
+            # Stores all operations for further logging.
+            operations += lines
+           
+            # Make data a bytes stream to send over the socket connection .
             stream = self.make_stream(lines)
             
-            # Instatiate the TCPSocket object in a sock object to interact with 
-            # the server
+            # Instatiate the TCPSocket class in a sock object to interact with the server.
             sock = TCPInterfaceClient()
             
             sock.connect()
             sock.send(stream)
-            
+            # In case of the server the null delimiter never gets send beacause the
+            # the client does not shut the conection until data is received, hence
+            # we must send this flag manually.
             
             # Wait until recieved entire information
-            results = sock.receive()
+            r = sock.receive()
+            #Store every iteration result in the results variable to further logging
+            results = results + r.split(",")
             sock.close_connection()
-
-            if len(lines) != len(results.split(',')):
-                print("Error")
-
-        operation_file.close()
         
+        operation_file.close()
+        self.log(operations,results)
+
+    def log(self,operations,results):
+        # Open the file in append mode
+        log_file = open('operations.log','a')
+        
+        # opeations and results list are ordered list objects where every item
+        # inside them correspond with the item in the same position
+        # in the other.
+    
+        log_file.write("Operations log file".center(60,'*'))
+        log_file.write("\n")
+        for operation,result in zip(operations,results):
+            full_operation = f"\nOperation: {operation.rstrip()} = {result}"
+            log_file.write(full_operation)
+
+        log_file.close()
+        return
+    
 if __name__ == "__main__":
     # Instatiate the Client and start getting and sending operations
      client = ClientOperator()
      client.start()
-
 
 
 
