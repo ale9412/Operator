@@ -59,10 +59,12 @@ class TCPInterfaceClient:
 
 class ClientOperator:
 
-    def __init__(self):
+    def __init__(self,file_path='operations.txt'):
         # Expression to parse matematical operations
         self.regex = r'(\d+\s[+*-/]\s)+\d+'
 
+        self.file_path = file_path
+        
         # Clean the log file in case that exist already
         log_file = open('operations.log','w')
         log_file.close()
@@ -76,7 +78,7 @@ class ClientOperator:
         return bytes(','.join(operation.strip() for operation in operations_list).encode('utf-8'))
     
     def start(self):
-        operation_file = open("operations.txt")
+        operation_file = open(self.file_path)
         operations = []
         results = []
         while True:
