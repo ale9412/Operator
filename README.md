@@ -27,6 +27,21 @@ The server to speed up the calculations will use multiple processes, the default
 
 To complete the task the programm takes no more that 10 seconds.
 
+### Running the tests
+
+The script test.py contains all the test necessary to check whether the system works properly. If something goes wrong the script will tell you exactly what part fail.
+
 ### Bugs
 
 Currently the server throw an error on Windows with python 3.7.2 due to multiprocessing module. This does not occur with a lower python 3 version or in a Linux OS.
+
+## Authors
+
+* **Alejandro Martin** - *Initial work* - [PyChat](https://github.com/ale9412/PyChaT)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+
+
