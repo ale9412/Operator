@@ -1,5 +1,5 @@
 # Operator
-A client-server program to calculate mathematical operations, exchanging information using sockets
+A client-server program to calculate mathematical operations, exchanging information using sockets in a multithreaded way
 
 ## Getting Started
 
